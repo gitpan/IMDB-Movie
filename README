@@ -1,0 +1,24 @@
+NAME
+    IMDB::Movie
+
+INSTALL
+    Installation as usual:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DESCRIPTION
+    See perldoc IMDB::Movie
+
+HISTORY
+	0.01 - Initial release
+
+AUTHOR
+    Jeffrey Hayes Anderson <captvanhalen@yahoo.com>
+
+COPYRIGHT
+    Copyright (c) 2003 Jeffrey Hayes Anderson.
+	See source POD for additional copyright information.
+

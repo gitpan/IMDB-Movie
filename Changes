@@ -1,5 +1,12 @@
 Revision history for Perl extension IMDB::Movie.
 
+0.10 Sun Nov 23 2003
+	- user can specify which site to search (www is default)
+	- capturing search results from title searches
+	- capturing first billed cast (added cast() method)
+
+0.09  ?
+
 0.08  Sun Nov  2 2003
 	- fixed _get_lucky (you can search by title again)
 

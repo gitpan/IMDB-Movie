@@ -9,6 +9,7 @@ require_ok('Movie');
 my ($movie,%tmpl);
 my $ans = prompt("connect to imdb.com server?","y");
 
+# thanks to da PodMasta for suggesting prompt and SKIP
 SKIP: {
     skip "you didn't want to connect", 12 if $ans =~ /^(q|n)/i;
 	print "This test's random movie (from list of 1 movie) will be 'Alien'...\n";
@@ -29,3 +30,6 @@ SKIP: {
 	is_deeply($tmpl{writers}[1],{qw(id 0795953 last_name Shusett first_name Ronald)},'HTML::Template correct writer 2');
 	is_deeply($movie->director,['Scott, Ridley'],'deep copy successful');
 };
+
+
+# TODO: test cast and matches

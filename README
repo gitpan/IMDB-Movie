@@ -13,6 +13,8 @@ DESCRIPTION
     See perldoc IMDB::Movie
 
 HISTORY
+	0.07 - fixed bugs in 0.06
+	0.06 - changed to accomodate IMDB's new person layout
 	0.05 - added as_HTML_Template(), more docs
 	0.04 - they change the interface, i fix
 	0.02 - added user_rating, disclaimer

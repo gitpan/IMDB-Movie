@@ -8,7 +8,7 @@ use LWP::Simple;
 use HTML::TokeParser;
 use Data::Dumper;
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 use constant URL => 'http://www.imdb.com/title/tt';
 
 sub new {
@@ -56,8 +56,8 @@ sub as_HTML_Template {
 	my $clone = Clone::clone($self);
 	my %d = %{$clone->directors};
 	my %w = %{$clone->writers};
-	$clone->{directors} = [ map {id => $_,%{$d{$_}}}, sort{$a<=>$b} keys %d ];
-	$clone->{writers}   = [ map {id => $_,%{$w{$_}}}, sort{$a<=>$b} keys %w ];
+	$clone->{directors} = [ sort{$a->{id}<=>$b->{id}} values %d ];
+	$clone->{writers}   = [ sort{$a->{id}<=>$b->{id}} values %w ];
 	$clone->{genres}    = [ map {name => $_}, @{$clone->genres} ];
 	return %$clone;
 }
@@ -75,7 +75,7 @@ sub DESTROY {}
 
 ############################################################################
 
-sub _merge_names { [sort map "$_->{last}, $_->{first}", values %{shift->{+shift}} ] }
+sub _merge_names { [sort map "$_->{last_name}, $_->{first_name}", values %{shift->{+shift}} ] }
 
 sub _title_year {
 	my $parser = shift;
@@ -165,8 +165,7 @@ sub _person {
 		$name = reverse $name;
 		my ($l,$f) = map { scalar reverse $_} split(' ',$name,2);
 
-		#push @name, "$l, $f";
-		$name{$id} = { last => $l, first => $f };
+		$name{$id} = { id => $id, last_name => $l, first_name => $f };
 
 		$parser->get_tag('br');
 		redo;

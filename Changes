@@ -1,5 +1,13 @@
 Revision history for Perl extension IMDB::Movie.
 
+0.07  Sun Oct 26 2003
+	- forgot to upate next to last test
+	- changed first and last to first_name and last_name
+
+0.06  Sun Oct 26 2003
+	- changed behavior of director(s) writer(s)
+	- changed as_HTML_Template()'s returned thingy
+
 0.05  Sun Sept 28 2003
 	- added as_HTML_Template (now requires Clone.pm)
 	- added minimal method documentation

@@ -1,10 +1,13 @@
 Revision history for Perl extension IMDB::Movie.
 
-0.01  Fri Sept 11 2003
+0.05  Sun Sept 28 2003
+	- added as_HTML_Template (now requires Clone.pm)
+	- added minimal method documentation
+
+0.04  Fri Sept 11 2003
 	- main url changed
 	- directors and writers changed: links were names, now are id's
 	- ratings changed: easy fix
 
 0.01  Tue Aug 12 2003
 	- original version; created by h2xs 1.20 with options -A -X IMDB::Movie
-

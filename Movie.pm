@@ -8,7 +8,7 @@ use LWP::Simple;
 use HTML::TokeParser;
 use Data::Dumper;
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 use constant URL => 'http://www.imdb.com/title/tt';
 
 sub new {
@@ -50,6 +50,16 @@ sub to_string() {
 		join(', ',@{$self->{director}}),
 	);
 
+}
+
+sub as_HTML_Template {
+	my $self = shift;
+	require('Clone.pm');
+	my $clone = Clone::clone($self);
+	$clone->{directors} = [ map {name => $_}, @{$clone->directors} ];
+	$clone->{writers}   = [ map {name => $_}, @{$clone->writers} ];
+	$clone->{genres}    = [ map {name => $_}, @{$clone->genres} ];
+	return %$clone;
 }
 
 sub AUTOLOAD {
@@ -231,10 +241,79 @@ IMDB.pm will try to return the best match.
     join(';',@{$movie->director}),
     join(';',@{$movie->writer}),
     join(';',@{$movie->genre}),
-	$movie->user_rating,
+    $movie->user_rating,
+    $movie->img,
   ), "\n";
 
   sleep 5;
+
+  # now more compatible with HTML::Template!
+  $tmpl_param->($movie->as_HTML_Template);
+
+=head1 METHODS 
+
+=over 4
+
+=item B<title>
+
+  my $title = $movie->title;
+
+Returns the IMDB given title of this movie.
+
+=item B<id>
+
+  my $id = $movie->id;
+
+Returns the IMDB id of this movie.
+
+=item B<year>
+
+  my $year = $movie->year;
+
+Returns the year the movie was released.
+
+=item B<directors>
+
+  my @directors = @{$movie->directors};
+
+Return an anymous array reference of director(s).
+
+=item B<writers>
+
+  my @writers = @{$movie->writers};
+
+Return an anymous array reference of writer(s).
+
+=item B<genres>
+
+  my @genres = @{$movie->genres};
+
+Return an anymous array reference of genre(s).
+
+=item B<user_rating>
+
+  my $user_rating = $movie->user_rating;
+
+Returns the current IMDB user rating as is.
+
+=item B<img>
+
+  my $img = $movie->img;
+
+Returns the url of the image use for this Movie at imdb.com
+
+=item B<as_HTML_Template>
+
+  my %t_movie = $movie->as_HTML_Template;
+
+This simply returns a hash that is a clone of the IMDB::Movie object.
+The only difference between the clone and the original is the
+clone's directors, writers, and genres methods return HTML::Template
+ready data structures. Just use Data::Dumper and see the ouput
+for yourself - if you use HTML::Template, you'll know what to do
+with it.
+
+=back
 
 =head1 AUTHOR 
 

@@ -7,5 +7,6 @@ WriteMakefile(
 		'Test::More'       => 0.47,
 		'LWP::Simple'      => 1.36,
 		'HTML::TokeParser' => 2.24,
+		'Clone'            => 0.15,
 	}, 
 );

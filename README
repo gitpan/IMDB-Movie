@@ -13,6 +13,7 @@ DESCRIPTION
     See perldoc IMDB::Movie
 
 HISTORY
+	0.05 - added as_HTML_Template(), more docs
 	0.04 - they change the interface, i fix
 	0.02 - added user_rating, disclaimer
 	0.01 - Initial release

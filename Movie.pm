@@ -6,9 +6,10 @@ use vars qw($VERSION $AUTOLOAD);
 use Carp;
 use LWP::Simple;
 use HTML::TokeParser;
+use Data::Dumper;
 
-$VERSION = '0.02';
-use constant URL => 'http://us.imdb.com/Title';
+$VERSION = '0.04';
+use constant URL => 'http://www.imdb.com/title/tt';
 
 sub new {
 	my ($class,$id) = @_;
@@ -37,6 +38,7 @@ sub new {
 		genres      => _genre($parser),
 		user_rating => _user_rating($parser),
 	};
+	#print STDERR Dumper $self;
 	return bless $self, $class;
 }
 
@@ -100,15 +102,15 @@ sub _get_lucky {
 
 sub _id {
 	my $parser = shift;
-	my $tag;
+	my ($id,$tag);
 
-	while ($tag = $parser->get_tag('a')) {
-		if ($tag->[1]->{href}) {
-			last if $tag->[1]->{href} =~ /Details/;
+	while ($tag = $parser->get_tag('select')) {
+		if ($tag->[1]->{name}) {
+			($id) = $tag->[1]->{name} =~ /(\d+)/;
+			last if $id;
 		}
 	}
-	my ($id) = $tag->[1]->{href} =~ /Details\?(\d{7})/;
-
+	
 	return $id;
 }
 
@@ -132,23 +134,26 @@ sub _image {
 
 sub _director {
 	my $parser = shift;
-	my ($tag,@director);
+	my ($tag,@name);
 
 	# skip
 	$parser->get_tag('br');
 	{
 		$tag = $parser->get_tag();
 		last unless $tag->[0] eq 'a';
-		last if $parser->get_text eq '(more)';
-		my ($director) = $tag->[1]->{href} =~ /\?(.*)$/;
-		$director =~ tr/+/ /;
-		$director =~ s/%([\dA-Fa-f]{2})/pack("C",hex($1))/eg;
-		push @director,$director;
+
+		my $name = $parser->get_text;
+		last if $name eq '(more)';
+		
+		$name = reverse $name;
+		my ($l,$f) = map { scalar reverse $_} split(' ',$name,2);
+		push @name, "$l, $f";
 		$parser->get_tag('br');
+
 		redo;
 	}
 
-	return [ unique(@director) ];
+	return [ unique(@name) ];
 }
 
 sub _genre {
@@ -178,7 +183,7 @@ sub _user_rating {
 
 	while ($tag = $parser->get_tag('a')) {
 		if ($tag->[1]->{href}) {
-			last if $tag->[1]->{href} =~ /Ratings/;
+			last if $tag->[1]->{href} eq 'ratings';
 		}
 	}
 	$tag = $parser->get_tag('b');
@@ -187,7 +192,7 @@ sub _user_rating {
 }
 
 sub _get_toker {
-	my $url = URL . "?" . shift();
+	my $url = URL . shift;
 	my $content = get($url) or carp "can't connect to server";
 	return HTML::TokeParser->new(\$content);
 }

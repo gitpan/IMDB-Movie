@@ -8,14 +8,13 @@ use LWP::Simple;
 use HTML::TokeParser;
 use Data::Dumper;
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 use constant URL => 'http://www.imdb.com/title/tt';
 
 sub new {
 	my ($class,$id) = @_;
 	carp "can't instantiate $class without id or keyword" unless $id;
 	$id = sprintf("%07d",$id) unless length($id) == 8;
-	#warn "fetching $id\n";
 
 	my $parser = _get_toker($id);
 	my ($title,$year);
@@ -33,12 +32,11 @@ sub new {
 		year        => $year,
 		id          => _id($parser),
 		img         => _image($parser),
-		directors   => _director($parser),
-		writers     => _director($parser),
+		directors   => _person($parser),
+		writers     => _person($parser),
 		genres      => _genre($parser),
 		user_rating => _user_rating($parser),
 	};
-	#print STDERR Dumper $self;
 	return bless $self, $class;
 }
 
@@ -56,11 +54,16 @@ sub as_HTML_Template {
 	my $self = shift;
 	require('Clone.pm');
 	my $clone = Clone::clone($self);
-	$clone->{directors} = [ map {name => $_}, @{$clone->directors} ];
-	$clone->{writers}   = [ map {name => $_}, @{$clone->writers} ];
+	my %d = %{$clone->directors};
+	my %w = %{$clone->writers};
+	$clone->{directors} = [ map {id => $_,%{$d{$_}}}, sort{$a<=>$b} keys %d ];
+	$clone->{writers}   = [ map {id => $_,%{$w{$_}}}, sort{$a<=>$b} keys %w ];
 	$clone->{genres}    = [ map {name => $_}, @{$clone->genres} ];
 	return %$clone;
 }
+
+sub director { shift->_merge_names('directors') }
+sub writer   { shift->_merge_names('writers') }
 
 sub AUTOLOAD {
 	my ($self) = @_;
@@ -71,6 +74,8 @@ sub AUTOLOAD {
 sub DESTROY {}
 
 ############################################################################
+
+sub _merge_names { [sort map "$_->{last}, $_->{first}", values %{shift->{+shift}} ] }
 
 sub _title_year {
 	my $parser = shift;
@@ -142,9 +147,10 @@ sub _image {
 	return $image;
 }
 
-sub _director {
+sub _person {
 	my $parser = shift;
-	my ($tag,@name);
+	#my ($tag,@name);
+	my ($tag,%name);
 
 	# skip
 	$parser->get_tag('br');
@@ -155,15 +161,19 @@ sub _director {
 		my $name = $parser->get_text;
 		last if $name eq '(more)';
 		
+		my ($id) = $tag->[1]{href} =~ /(\d+)/;
 		$name = reverse $name;
 		my ($l,$f) = map { scalar reverse $_} split(' ',$name,2);
-		push @name, "$l, $f";
-		$parser->get_tag('br');
 
+		#push @name, "$l, $f";
+		$name{$id} = { last => $l, first => $f };
+
+		$parser->get_tag('br');
 		redo;
 	}
 
-	return [ unique(@name) ];
+	#return [ unique(@name) ];
+	return {%name};
 }
 
 sub _genre {
@@ -248,7 +258,7 @@ IMDB.pm will try to return the best match.
   sleep 5;
 
   # now more compatible with HTML::Template!
-  $tmpl_param->($movie->as_HTML_Template);
+  $tmpl->param($movie->as_HTML_Template);
 
 =head1 METHODS 
 
@@ -272,23 +282,47 @@ Returns the IMDB id of this movie.
 
 Returns the year the movie was released.
 
+=item B<director>
+
+  my @director = @{$movie->director};
+
+Returns an anonymous array reference of director names.
+
 =item B<directors>
 
-  my @directors = @{$movie->directors};
+  my %director = %{$movie->directors};
+  for my $id (keys %director) {
+     print $director{$id}{first};
+     print $director{$id}{last};
+  }
 
-Return an anymous array reference of director(s).
+Returns an anonymous hash reference whose keys are IMDB
+name id's and whose values are anonymous hash references
+containing first and last name key/value pairs.
+
+=item B<writer>
+
+  my @writer = @{$movie->writer};
+
+Returns an anonymous array reference of writer names.
 
 =item B<writers>
 
-  my @writers = @{$movie->writers};
+  my %writer = %{$movie->writers};
+  for my $id (keys %writer) {
+     print $writer{$id}{first};
+     print $writer{$id}{last};
+  }
 
-Return an anymous array reference of writer(s).
+Return an anonymous hash reference whose keys are IMDB
+name id's and whose values are anonymous hash references
+containing first and last name key/value pairs.
 
 =item B<genres>
 
   my @genres = @{$movie->genres};
 
-Return an anymous array reference of genre(s).
+Returns an anonymous array reference of genre names.
 
 =item B<user_rating>
 
@@ -300,7 +334,7 @@ Returns the current IMDB user rating as is.
 
   my $img = $movie->img;
 
-Returns the url of the image use for this Movie at imdb.com
+Returns the url of the image used for this Movie at imdb.com
 
 =item B<as_HTML_Template>
 

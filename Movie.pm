@@ -8,7 +8,7 @@ use LWP::Simple;
 use HTML::TokeParser;
 use Data::Dumper;
 
-$VERSION = '0.10';
+$VERSION = '0.12';
 
 sub new {
 	my ($class,$id,$site) = @_;
@@ -287,7 +287,7 @@ IMDB.pm will try to return the best match.
     $movie->year, 
     join(';',@{$movie->director}),
     join(';',@{$movie->writer}),
-    join(';',@{$movie->genre}),
+    join(';',@{$movie->genres}),
     $movie->user_rating,
     $movie->img,
   ), "\n";
@@ -346,8 +346,8 @@ Returns an anonymous array reference of director names.
 
   my %director = %{$movie->directors};
   for my $id (keys %director) {
-     print $director{$id}{first};
-     print $director{$id}{last};
+     print $director{$id}{first_name};
+     print $director{$id}{last_name};
   }
 
 Returns an anonymous hash reference whose keys are IMDB
@@ -364,8 +364,8 @@ Returns an anonymous array reference of writer names.
 
   my %writer = %{$movie->writers};
   for my $id (keys %writer) {
-     print $writer{$id}{first};
-     print $writer{$id}{last};
+     print $writer{$id}{first_name};
+     print $writer{$id}{last_name};
   }
 
 Return an anonymous hash reference whose keys are IMDB
@@ -376,8 +376,8 @@ containing first and last name key/value pairs.
 
   my %cast = %{$movie->cast};
   for my $id (keys %cast) {
-     print $cast{$id}{first};
-     print $cast{$id}{last};
+     print $cast{$id}{first_name};
+     print $cast{$id}{last_name};
   }
 
 Return an anonymous hash reference whose keys are IMDB
@@ -448,9 +448,32 @@ with it.
 
 =back
 
+=head1 BUGS
+
+If you have found a bug, typo, etc. please visit Best Practical Solution's
+CPAN bug tracker at http://rt.cpan.org:
+
+E<lt>http://rt.cpan.org/NoAuth/Bugs.html?Dist=IMDB-MovieE<gt>
+
+or send mail to E<lt>bug-IMDB-Movie#rt.cpan.orgE<gt>
+
+(you got this far ... you can figure out how to make that
+a valid address ... and note that i won't respond to bugs
+sent to my personal address any longer)
+
 =head1 AUTHOR 
 
-Jeffrey Hayes Anderson <captvanhalen@yahoo.com>
+Jeffrey Hayes Anderson
+
+=head1 CREDITS
+
+Various suggestions and typo spottings:
+
+   - Danilo Aghemo
+   - ArteQ 2
+   - Marvin Baschangel
+   - V. Ray Krebs III
+   - Codrut C. Racosanu
 
 =head1 DISCLAIMER
 
@@ -467,9 +490,9 @@ notice.
 
 =head1 COPYRIGHT
 
-Module Copyright (c) 2003 Jeffrey Hayes Anderson.
+Movie Data Copyright (c) 1990-2004 Internet Movie Database Inc.
 
-Movie Data Copyright (c) 1990-2003 Internet Movie Database Inc.
+Module Copyright (c) 2004 Jeffrey Hayes Anderson.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

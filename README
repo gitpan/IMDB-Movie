@@ -12,21 +12,11 @@ INSTALL
 DESCRIPTION
     See perldoc IMDB::Movie
 
-HISTORY
-	0.10 - site prefix, capturing title search matches, 1st billed cast
-	0.09 - ??
-	0.08 - fixed _get_lucky() (you can fetch by title again)
-	0.07 - fixed bugs in 0.06
-	0.06 - changed to accomodate IMDB's new person layout
-	0.05 - added as_HTML_Template(), more docs
-	0.04 - they change the interface, i fix
-	0.02 - added user_rating, disclaimer
-	0.01 - Initial release
-
 AUTHOR
-    Jeffrey Hayes Anderson <captvanhalen@yahoo.com>
+    Jeffrey Hayes Anderson
 
 COPYRIGHT
-    Copyright (c) 2003 Jeffrey Hayes Anderson.
-	See source POD for additional copyright information.
+	Movie Data Copyright (c) 1990-2004 Internet Movie Database Inc.
+	Module Copyright     (c) 2004 Jeffrey Hayes Anderson.
 
+	See source POD for additional copyright information.

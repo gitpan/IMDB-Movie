@@ -1,31 +1,34 @@
 Revision history for Perl extension IMDB::Movie.
 
-0.10 Sun Nov 23 2003
+0.12  Jan 01 2004
+	- doc updates/typo corrections
+
+0.10  Nov 23 2003
 	- user can specify which site to search (www is default)
 	- capturing search results from title searches
 	- capturing first billed cast (added cast() method)
 
 0.09  ?
 
-0.08  Sun Nov  2 2003
+0.08  Nov  2 2003
 	- fixed _get_lucky (you can search by title again)
 
-0.07  Sun Oct 26 2003
+0.07  Oct 26 2003
 	- forgot to upate next to last test
 	- changed first and last to first_name and last_name
 
-0.06  Sun Oct 26 2003
+0.06  Oct 26 2003
 	- changed behavior of director(s) writer(s)
 	- changed as_HTML_Template()'s returned thingy
 
-0.05  Sun Sept 28 2003
+0.05  Sept 28 2003
 	- added as_HTML_Template (now requires Clone.pm)
 	- added minimal method documentation
 
-0.04  Fri Sept 11 2003
+0.04  Sept 11 2003
 	- main url changed
 	- directors and writers changed: links were names, now are id's
 	- ratings changed: easy fix
 
-0.01  Tue Aug 12 2003
+0.01  Aug 12 2003
 	- original version; created by h2xs 1.20 with options -A -X IMDB::Movie

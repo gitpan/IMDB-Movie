@@ -1,5 +1,6 @@
 #use Test::More qw(no_plan);
 use Test::More tests => 13;
+use Data::Dumper;
 
 require_ok('Movie');
 
@@ -16,7 +17,7 @@ is($movie->year,1979,'right year');
 like($movie->user_rating,qr/\d+\.?\d*/,"got a user_rating: " . $movie->user_rating);
 is_deeply($movie->directors,{'0000631'=>{qw(id 0000631 last_name Scott first_name Ridley)}},'strict: correct director');
 is_deeply($movie->writer,['O\'Bannon, Dan','Shusett, Ronald'],'loose:  correct writers');
-is_deeply($movie->genres, [qw(Sci-Fi Horror Thriller Action)],'normal: correct genres');
+is_deeply($movie->genres, [qw(Sci-Fi Horror Thriller)],'normal: correct genres');
 
 %tmpl = $movie->as_HTML_Template;
 is_deeply($tmpl{directors}[0],{qw(id 0000631 last_name Scott first_name Ridley)},'HTML::Template correct director');

@@ -8,13 +8,14 @@ use LWP::Simple;
 use HTML::TokeParser;
 use Data::Dumper;
 
-$VERSION = '0.07';
-use constant URL => 'http://www.imdb.com/title/tt';
+$VERSION = '0.08';
+use constant TITLE => 'http://www.imdb.com/title/tt';
+use constant FIND  => 'http://www.imdb.com/Find?select=All&for=';
 
 sub new {
 	my ($class,$id) = @_;
 	carp "can't instantiate $class without id or keyword" unless $id;
-	$id = sprintf("%07d",$id) unless length($id) == 8;
+	$id = sprintf("%07d",$id) unless length($id) == 8 or $id =~ /\D/;
 
 	my $parser = _get_toker($id);
 	my ($title,$year);
@@ -23,6 +24,7 @@ sub new {
 	($parser,$title,$year) = _title_year($parser,$id);
 
 	$title =~ tr/"//d;
+	warn "$title\n";
 
 	# need better way to handle errors, maybe?
 	carp "$id turned up no matches" unless $parser;
@@ -85,7 +87,7 @@ sub _title_year {
 	$parser->get_tag('title');
 	$title = $parser->get_text();
 
-	if ($title eq 'IMDb title search') {
+	if ($title eq 'IMDb name and title search') {
 		$id = _get_lucky($parser,$id);
 
 		# start over
@@ -102,15 +104,13 @@ sub _title_year {
 
 sub _get_lucky {
 	my ($parser,$thing) = @_;
-	my $tag;
+	my ($tag,$id);
 
 	while ($tag = $parser->get_tag('a')) {
-		if ($tag->[1]->{name}) {
-			last if $tag->[1]->{name} =~ /mov/;
-		}
+		my $href = $tag->[1]->{href};
+		next unless $href;
+		last if ($id) = $href =~ /\/title\/tt(\d{7})/;
 	}
-	$tag = $parser->get_tag('a');
-	my ($id) = $tag->[1]->{href} =~ /(\d{7})/;
 
 	return $id;
 }
@@ -211,8 +211,16 @@ sub _user_rating {
 }
 
 sub _get_toker {
-	my $url = URL . shift;
+	my $id = shift;
+	#warn "$id\n";
+	my $url = ($id =~ /\D/)
+		? FIND  .$id
+		: TITLE . $id
+	;
+	#warn "fetching $url\n";
+
 	my $content = get($url) or carp "can't connect to server";
+	#print $content;
 	return HTML::TokeParser->new(\$content);
 }
 
@@ -242,7 +250,7 @@ IMDB.pm will try to return the best match.
   use strict;
   use IMDB::Movie;
 
-  my $movie = IMDB::Movie->new('78748');
+  my $movie = IMDB::Movie->new(92610);
   print join("|",
     $movie->title, 
     $movie->id, 
@@ -262,6 +270,17 @@ IMDB.pm will try to return the best match.
 =head1 METHODS 
 
 =over 4
+
+=item B<new>
+
+  my $movie_by_id = IMDB::Movie->new(92610);
+
+  my $movie_by_title = IMDB::Movie->new('Bad Taste');
+
+Instantiates the object and fetches the movie. IMDB::Movie prefers
+the IMDB identification number, but you can pass the name of the
+movie with moderate success. Note that this causes an extra page
+fetch as IMDB::Movie parses the search results.
 
 =item B<title>
 

@@ -8,7 +8,7 @@ use LWP::Simple;
 use HTML::TokeParser;
 use Data::Dumper;
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 use constant TITLE => 'http://www.imdb.com/title/tt';
 use constant FIND  => 'http://www.imdb.com/Find?select=All&for=';
 
@@ -24,7 +24,6 @@ sub new {
 	($parser,$title,$year) = _title_year($parser,$id);
 
 	$title =~ tr/"//d;
-	warn "$title\n";
 
 	# need better way to handle errors, maybe?
 	carp "$id turned up no matches" unless $parser;
@@ -212,15 +211,12 @@ sub _user_rating {
 
 sub _get_toker {
 	my $id = shift;
-	#warn "$id\n";
 	my $url = ($id =~ /\D/)
 		? FIND  .$id
 		: TITLE . $id
 	;
-	#warn "fetching $url\n";
 
 	my $content = get($url) or carp "can't connect to server";
-	#print $content;
 	return HTML::TokeParser->new(\$content);
 }
 

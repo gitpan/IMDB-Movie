@@ -13,6 +13,7 @@ DESCRIPTION
     See perldoc IMDB::Movie
 
 HISTORY
+	0.02 - added user_rating, disclaimer
 	0.01 - Initial release
 
 AUTHOR

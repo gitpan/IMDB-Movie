@@ -7,14 +7,14 @@ use Carp;
 use LWP::Simple;
 use HTML::TokeParser;
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 use constant URL => 'http://us.imdb.com/Title';
 
 sub new {
 	my ($class,$id) = @_;
 	carp "can't instantiate $class without id or keyword" unless $id;
 	$id = sprintf("%07d",$id) unless length($id) == 8;
-	warn "fetching $id\n";
+	#warn "fetching $id\n";
 
 	my $parser = _get_toker($id);
 	my ($title,$year);
@@ -28,13 +28,14 @@ sub new {
 	carp "$id turned up no matches" unless $parser;
 
 	my $self = {
-		title    => $title,
-		year     => $year,
-		id       => _id($parser),
-		img      => _image($parser),
-		director => _director($parser),
-		writer   => _director($parser),
-		genre    => _genre($parser),
+		title       => $title,
+		year        => $year,
+		id          => _id($parser),
+		img         => _image($parser),
+		directors   => _director($parser),
+		writers     => _director($parser),
+		genres      => _genre($parser),
+		user_rating => _user_rating($parser),
 	};
 	return bless $self, $class;
 }
@@ -171,6 +172,20 @@ sub _genre {
 	return [ unique(@genre) ];
 }
 
+sub _user_rating {
+	my $parser = shift;
+	my $tag;
+
+	while ($tag = $parser->get_tag('a')) {
+		if ($tag->[1]->{href}) {
+			last if $tag->[1]->{href} =~ /Ratings/;
+		}
+	}
+	$tag = $parser->get_tag('b');
+	my ($rating) = split('\/',$parser->get_text,2);
+	return $rating;
+}
+
 sub _get_toker {
 	my $url = URL . "?" . shift();
 	my $content = get($url) or carp "can't connect to server";
@@ -211,15 +226,33 @@ IMDB.pm will try to return the best match.
     join(';',@{$movie->director}),
     join(';',@{$movie->writer}),
     join(';',@{$movie->genre}),
+	$movie->user_rating,
   ), "\n";
+
+  sleep 5;
 
 =head1 AUTHOR 
 
 Jeffrey Hayes Anderson <captvanhalen@yahoo.com>
 
+=head1 DISCLAIMER
+
+This module should be used VERY SPARSLEY. The good people at
+the Internet Movie Database provide access to their websites
+for free, and i do not want this module to be used in an
+irresponsible manor.
+
+Also, screen-scraping a web site does not make for a long living
+application. Any changes to IMDB's design could potentially break
+this module. I give no garuantee that i will maintain this module,
+but i will garuantees that i may just delete this module with no
+notice. 
+
 =head1 COPYRIGHT
 
-Copyright (c) 2003 Jeffrey Hayes Anderson.
+Module Copyright (c) 2003 Jeffrey Hayes Anderson.
+
+Movie Data Copyright (c) 1990-2003 Internet Movie Database Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
